@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import requests
 import json
+import requests
+
 from datetime import datetime
 from datetime import timedelta
-import ics import Calendar, Event
+from ics import Calendar, Event
 
 username = '<email>'
 password = '<password>'
@@ -21,6 +22,8 @@ logindataJson = json.dumps(logindata, indent=4)
 
 #token page
 tokenpage = requests.post(loginurl, data = logindataJson)
+print(tokenpage.text)
+
 tokenJson = json.loads(tokenpage.text)
 tokenType = tokenJson['token_type']
 token = tokenJson['access_token']
@@ -44,7 +47,6 @@ deliverystart = datetime.strptime(deliverystartstring, "%Y-%m-%dT%H:%M:%S+0000")
 deliveryend = deliverystart + timedelta(minutes=addminutes)
 
 #ics event
-from ics import Calendar, Event
 c = Calendar()
 e = Event()
 e.name = 'Hellofresh'
