@@ -5,7 +5,7 @@ import cloudscraper
 
 from datetime import datetime
 from datetime import timedelta
-from ics import Calendar, Event
+import ics import Calendar, Event
 
 requests = cloudscraper.create_scraper()
 
@@ -47,6 +47,7 @@ deliverystart = datetime.strptime(deliverystartstring, "%Y-%m-%dT%H:%M:%S+0000")
 deliveryend = deliverystart + timedelta(minutes=addminutes)
 
 #ics event
+from ics import Calendar, Event
 c = Calendar()
 e = Event()
 e.name = 'Hellofresh'
