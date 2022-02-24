@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 import json
-import requests
+import cloudscraper
 
 from datetime import datetime
 from datetime import timedelta
 from ics import Calendar, Event
+
+requests = cloudscraper.create_scraper()
 
 username = '<email>'
 password = '<password>'
