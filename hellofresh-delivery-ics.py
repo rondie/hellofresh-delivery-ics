@@ -2,7 +2,6 @@
 
 import json
 import cloudscraper
-
 from datetime import datetime
 from datetime import timedelta
 import ics import Calendar, Event
