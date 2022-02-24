@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 
+import os
 import requests
 import json
 from datetime import datetime
 from datetime import timedelta
 import ics import Calendar, Event
 
-username = '<email>'
-password = '<password>'
+username = os.environ.get('HELLOFRESH_USERNAME')
+password = os.environ.get('HELLOFRESH_PASSWORD')
 url = 'https://www.hellofresh.nl'
-icsfile = '/tmp/hellofresh-delivery.ics'
+icsfile = os.environ.get('HELLOFRESH_ICS_PATH')
 addminutes = 15
 country = 'nl'
 locale = 'nl-NL'
