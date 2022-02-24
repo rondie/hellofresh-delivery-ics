@@ -22,8 +22,6 @@ logindataJson = json.dumps(logindata, indent=4)
 
 #token page
 tokenpage = requests.post(loginurl, data = logindataJson)
-print(tokenpage.text)
-
 tokenJson = json.loads(tokenpage.text)
 tokenType = tokenJson['token_type']
 token = tokenJson['access_token']
