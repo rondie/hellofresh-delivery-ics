@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-import requests
 import json
+import requests
+
 from datetime import datetime
 from datetime import timedelta
-import ics import Calendar, Event
+from ics import Calendar, Event
 
 username = '<email>'
 password = '<password>'
@@ -44,7 +45,6 @@ deliverystart = datetime.strptime(deliverystartstring, "%Y-%m-%dT%H:%M:%S+0000")
 deliveryend = deliverystart + timedelta(minutes=addminutes)
 
 #ics event
-from ics import Calendar, Event
 c = Calendar()
 e = Event()
 e.name = 'Hellofresh'
