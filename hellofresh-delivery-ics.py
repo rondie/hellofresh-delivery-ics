@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 
-import json
 import cloudscraper
+import json
+import os
+
 from datetime import datetime
 from datetime import timedelta
-import ics import Calendar, Event
+from ics import Calendar, Event
 
 requests = cloudscraper.create_scraper()
 
-username = '<email>'
-password = '<password>'
+username = os.environ.get('HELLOFRESH_USERNAME')
+password = os.environ.get('HELLOFRESH_PASSWORD')
 url = 'https://www.hellofresh.nl'
-icsfile = '/tmp/hellofresh-delivery.ics'
+icsfile = os.environ.get('HELLOFRESH_ICS_PATH')
 addminutes = 15
 country = 'nl'
 locale = 'nl-NL'
@@ -46,7 +48,6 @@ deliverystart = datetime.strptime(deliverystartstring, "%Y-%m-%dT%H:%M:%S+0000")
 deliveryend = deliverystart + timedelta(minutes=addminutes)
 
 #ics event
-from ics import Calendar, Event
 c = Calendar()
 e = Event()
 e.name = 'Hellofresh'
