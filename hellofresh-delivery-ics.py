@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import cloudscraper
 import json
 import os
-
 from datetime import datetime
 from datetime import timedelta
+
+import cloudscraper
+
 from ics import Calendar, Event
 
 requests = cloudscraper.create_scraper()
@@ -18,12 +19,12 @@ addminutes = 15
 country = 'nl'
 locale = 'nl-NL'
 
-#login page
+# login page
 loginurl = url + '/gw/login'
 logindata = { 'username': username, 'password': password }
 logindataJson = json.dumps(logindata, indent=4)
 
-#token page
+# token page
 tokenpage = requests.post(loginurl, data = logindataJson)
 tokenJson = json.loads(tokenpage.text)
 tokenType = tokenJson['token_type']
@@ -35,24 +36,28 @@ params = dict()
 params['country'] = country
 params['locale'] = locale
 
-#deliveries overview
+# deliveries overview
 deliverylinkurl = url + '/gw/api/customers/me/deliveries'
-deliverylinkpage = requests.get(deliverylinkurl, headers=headers, params=params)
+deliverylinkpage = \
+    requests.get(deliverylinkurl, headers=headers, params=params)
 deliverylinkJson = json.loads(deliverylinkpage.text)
 
-#stop if no open deliveries 
+# stop if no open deliveries 
 if deliverylinkJson['items'][0]['tracking'] is None:
- print('no open deliveries')
- quit()
+    print('no open deliveries')
+    quit()
 
-#delivery page with start time
-deliveryurl = deliverylinkJson['items'][0]['tracking']['tracking_link']
-deliverystartstring = deliverylinkJson['items'][0]['tracking']['estimated_delivery_time']
-deliverystart = datetime.strptime(deliverystartstring, "%Y-%m-%dT%H:%M:%S+0000")
-#calculate the end time
+# delivery page with start time
+deliveryurl = \
+    deliverylinkJson['items'][0]['tracking']['tracking_link']
+deliverystartstring = \
+    deliverylinkJson['items'][0]['tracking']['estimated_delivery_time']
+deliverystart = \
+    datetime.strptime(deliverystartstring, "%Y-%m-%dT%H:%M:%S+0000")
+# calculate the end time
 deliveryend = deliverystart + timedelta(minutes=addminutes)
 
-#ics event
+# ics event
 c = Calendar()
 e = Event()
 e.name = 'Hellofresh'
