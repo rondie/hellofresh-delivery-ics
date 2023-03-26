@@ -1,70 +1,108 @@
 #!/usr/bin/env python3
 
 import json
-import os
-from datetime import datetime
-from datetime import timedelta
+import sys
+from datetime import datetime, time, timedelta
+from os.path import exists
 
 import cloudscraper
+
+from config import addminutes, country, icsfile, \
+    icsname, locale, password, sessionfile, url, username
 
 from ics import Calendar, Event
 
 requests = cloudscraper.create_scraper()
 
-username = os.environ.get('HELLOFRESH_USERNAME')
-password = os.environ.get('HELLOFRESH_PASSWORD')
-url = 'https://www.hellofresh.nl'
-icsfile = os.environ.get('HELLOFRESH_ICS_PATH')
-addminutes = 15
-country = 'nl'
-locale = 'nl-NL'
 
-# login page
-loginurl = url + '/gw/login'
-logindata = { 'username': username, 'password': password }
-logindataJson = json.dumps(logindata, indent=4)
+def getsession():
+    # login data
+    login_url = url + '/gw/login'
+    login_data = {'username': username, 'password': password}
+    login_data_json = json.dumps(login_data, indent=4)
+    # get access token
+    try:
+        token_page = requests.post(login_url, data=login_data_json)
+        token_page.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print("Login failed, check credentials")
+        print(err)
+        sys.exit(1)
+    token_json = json.loads(token_page.text)
+    token_type = token_json['token_type']
+    token = token_json['access_token']
+    expires_at = token_json['issued_at'] + token_json['expires_in']
+    # write session data to file
+    f = open(sessionfile, "w")
+    f.write(f"token_type = \
+        '{token_type}'\ntoken = '{token}'\nexpires_at = {expires_at}")
+    f.close()
+    return token, token_type
 
-# token page
-tokenpage = requests.post(loginurl, data = logindataJson)
-tokenJson = json.loads(tokenpage.text)
-tokenType = tokenJson['token_type']
-token = tokenJson['access_token']
+
+# use existing session if not expired
+if exists('hellofreshsession.py'):
+    from hellofreshsession import expires_at
+    if expires_at < datetime.now().timestamp():
+        token, token_type = getsession()
+    else:
+        from hellofreshsession import token, token_type
+else:
+    token, token_type = getsession()
+
 headers = {
-            'Authorization': tokenType + ' ' + token
+            'Authorization': token_type + ' ' + token
         }
 params = dict()
 params['country'] = country
 params['locale'] = locale
 
 # deliveries overview
-deliverylinkurl = url + '/gw/api/customers/me/deliveries'
-deliverylinkpage = \
-    requests.get(deliverylinkurl, headers=headers, params=params)
-deliverylinkJson = json.loads(deliverylinkpage.text)
+delivery_link_url = url + '/gw/api/customers/me/deliveries'
+try:
+    delivery_link_page = \
+        requests.get(delivery_link_url, headers=headers, params=params)
+    delivery_link_page.raise_for_status()
+except requests.exceptions.HTTPError as err:
+    print("Retrieve deliveries failed")
+    print(err)
+    sys.exit(1)
+delivery_link_json = json.loads(delivery_link_page.text)
+delivery_data = []
+for entry in delivery_link_json['items']:
+    tz = datetime.strptime(entry['deliveryDate'], "%Y-%m-%dT%H:%M:%S%z").tzinfo
+    if entry['tracking']:
+        # given time offset is not ISO8601 compliant (+0000), so we cut it off
+        begin = datetime.fromisoformat\
+            (entry['tracking']['estimated_delivery_time'][:19])
+        end = begin + timedelta(minutes=addminutes)
+        description = entry['product']['productName'] + '\n' + entry['tracking']['tracking_link']
+    else:
+        day = datetime.strptime(entry['deliveryDate'], "%Y-%m-%dT%H:%M:%S%z").date()
+        begin = datetime.combine(day, time.fromisoformat(entry['deliveryOption']['deliveryFrom']), tzinfo=tz)
+        end = datetime.combine(day, time.fromisoformat(entry['deliveryOption']['deliveryTo']), tzinfo=tz)
+        description = entry['product']['productName']
+    delivery_data.append({
+        'begin': begin,
+        'end': end,
+        'description': description
+        })
 
-# stop if no open deliveries 
-if deliverylinkJson['items'][0]['tracking'] is None:
-    print('no open deliveries')
-    quit()
 
-# delivery page with start time
-deliveryurl = \
-    deliverylinkJson['items'][0]['tracking']['tracking_link']
-deliverystartstring = \
-    deliverylinkJson['items'][0]['tracking']['estimated_delivery_time']
-deliverystart = \
-    datetime.strptime(deliverystartstring, "%Y-%m-%dT%H:%M:%S+0000")
-# calculate the end time
-deliveryend = deliverystart + timedelta(minutes=addminutes)
+def createics(icsfile):
+    with open(icsfile, 'w') as my_file:
+        # ics event
+        c = Calendar()
+        for entry in delivery_data:
+            e = Event()
+            e.name = icsname
+            e.begin = entry['begin']
+            e.end = entry['end']
+            e.description = entry['description']
+            c.events.add(e)
+        c.events
+        my_file.writelines(c)
 
-# ics event
-c = Calendar()
-e = Event()
-e.name = 'Hellofresh'
-e.begin = deliverystart
-e.end = deliveryend
-e.description = deliveryurl
-c.events.add(e)
-c.events
-with open(icsfile, 'w') as my_file:
-    my_file.writelines(c)
+
+if icsfile:
+    createics(icsfile)
