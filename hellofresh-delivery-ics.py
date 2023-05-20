@@ -13,6 +13,7 @@ from config import addminutes, country, icsfile, \
 from ics import Calendar, Event
 
 requests = cloudscraper.create_scraper()
+now = datetime.now().timestamp()
 
 
 def getsession():
@@ -43,7 +44,7 @@ def getsession():
 # use existing session if not expired
 if exists('hellofreshsession.py'):
     from hellofreshsession import expires_at
-    if expires_at < datetime.now().timestamp():
+    if expires_at < now:
         token, token_type = getsession()
     else:
         from hellofreshsession import token, token_type
@@ -104,5 +105,16 @@ def createics(icsfile):
         my_file.writelines(c)
 
 
+def nextrun(delivery_data):
+    delivery_data_begin = []
+    for entry in delivery_data:
+        delivery_data_begin.append({entry['begin']})
+    delivery_data_nearest = min(delivery_data_begin)
+    return(delivery_data_nearest)
+
+
 if icsfile:
     createics(icsfile)
+
+
+nextrun(delivery_data)
