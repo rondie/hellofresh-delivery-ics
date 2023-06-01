@@ -1,5 +1,5 @@
 APScheduler  == 0.0.0
-cloudscraper == 1.2.69
+cloudscraper == 1.2.71
 Flask        == 1.1.2
-requests     == 2.28.2
+requests     == 2.31.0
 ics          == 0.7.2
