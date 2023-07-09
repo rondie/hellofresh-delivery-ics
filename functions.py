@@ -12,9 +12,10 @@ from config import addminutes, country, debug, icsfile, icsname, locale, \
 
 from ics import Calendar, Event
 
-requests = cloudscraper.create_scraper()
+scraper = cloudscraper.create_scraper()
 now = datetime.now().timestamp()
 seconds_array = [600, 1800, 7200, 86400]
+
 
 scheduler = BackgroundScheduler({'apscheduler.executors.processpool': {
         'type': 'processpool',
@@ -43,9 +44,9 @@ def getsession():
     login_data_json = json.dumps(login_data, indent=4)
     # get access token
     try:
-        token_page = requests.post(login_url, data=login_data_json)
+        token_page = scraper.post(login_url, data=login_data_json)
         token_page.raise_for_status()
-    except requests.exceptions.HTTPError as err:
+    except Exception as err:
         print("Login failed, check credentials")
         print(err)
         sys.exit(1)
@@ -70,9 +71,9 @@ def get_deliveries():
     delivery_link_url = url + '/gw/api/customers/me/deliveries'
     try:
         delivery_link_page = \
-            requests.get(delivery_link_url, headers=headers, params=params)
+            scraper.get(delivery_link_url, headers=headers, params=params)
         delivery_link_page.raise_for_status()
-    except requests.exceptions.HTTPError as err:
+    except Exceptions as err:
         print("Retrieve deliveries failed")
         print(err)
         sys.exit(1)
