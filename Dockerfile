@@ -32,4 +32,4 @@ WORKDIR ${APPDIR}
 COPY --from=builder /venv /venv
 COPY --chown=${HELLOFRESH_ICS_UID}:${HELLOFRESH_ICS_GID} config.py functions.py app.py ${APPDIR}/
 
-ENTRYPOINT ["python3", "-m", "flask", "run"]
+ENTRYPOINT ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
