@@ -73,7 +73,7 @@ def get_deliveries():
         delivery_link_page = \
             scraper.get(delivery_link_url, headers=headers, params=params)
         delivery_link_page.raise_for_status()
-    except Exceptions as err:
+    except Exception as err:
         print("Retrieve deliveries failed")
         print(err)
         sys.exit(1)
@@ -138,7 +138,7 @@ def next_delivery():
     delivery_data_nearest = next(iter(min(delivery_data_begin)))
     if debug:
         print("DEBUG: next delivery at", delivery_data_nearest)
-    return(delivery_data_nearest)
+    return (delivery_data_nearest)
 
 
 def seconds_offset(seconds_array):
