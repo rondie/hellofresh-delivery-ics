@@ -11,7 +11,7 @@ from functions import create_ics, fetch_hf_data, get_deliveries, scheduler
 
 
 fetch_hf_data()
-scheduler.start
+scheduler.start()
 
 app = Flask(__name__)
 
