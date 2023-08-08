@@ -159,14 +159,25 @@ def seconds_offset(seconds_array):
 
 
 def fetch_hf_data():
-    get_deliveries()
-    create_ics(icsfile)
-    delivery = next_delivery()
-    run_date = delivery - timedelta(seconds=seconds_offset(seconds_array))
-    scheduler.add_job(
-        fetch_hf_data,
-        'date',
-        run_date=run_date
-    )
-    if debug:
-        print("DEBUG: next run scheduled at", run_date)
+    try:
+        get_deliveries()
+    except Exception:
+        run_date = now + timedelta(seconds=600)
+        scheduler.add_job(
+            fetch_hf_data,
+            'date',
+            run_date=run_date
+        )
+        if debug:
+            print("DEBUG: retrieve failed, next try scheduled at", run_date)
+    else:
+        create_ics(icsfile)
+        delivery = next_delivery()
+        run_date = delivery - timedelta(seconds=seconds_offset(seconds_array))
+        scheduler.add_job(
+            fetch_hf_data,
+            'date',
+            run_date=run_date
+        )
+        if debug:
+            print("DEBUG: next run scheduled at", run_date)
