@@ -5,10 +5,10 @@ import sys
 
 username = os.environ.get('HELLOFRESH_USERNAME')
 password = os.environ.get('HELLOFRESH_PASSWORD')
-url = os.environ.get('HELLOFRESH_ICS_URL','https://www.hellofresh.nl')
+url = os.environ.get('HELLOFRESH_ICS_URL', 'https://www.hellofresh.nl')
 sessionfile = 'hellofreshsession.py'
-country = os.environ.get('HELLOFRESH_ICS_COUNTRY','nl')
-locale = os.environ.get('HELLOFRESH_ICS_LOCALE','nl-NL')
+country = os.environ.get('HELLOFRESH_ICS_COUNTRY', 'nl')
+locale = os.environ.get('HELLOFRESH_ICS_LOCALE', 'nl-NL')
 
 icsfile = os.environ.get('HELLOFRESH_ICS_FILENAME', "hellofresh-delivery.ics")
 addminutes = 15
