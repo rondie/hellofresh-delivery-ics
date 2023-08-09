@@ -13,7 +13,7 @@ from config import addminutes, country, debug, icsfile, icsname, locale, \
 from ics import Calendar, Event
 
 scraper = cloudscraper.create_scraper()
-now = datetime.now().timestamp()
+now = datetime.now()
 seconds_array = [600, 1800, 7200, 86400]
 
 
@@ -28,7 +28,7 @@ scheduler = BackgroundScheduler({'apscheduler.executors.processpool': {
 def testsession():
     if exists('hellofreshsession.py'):
         from hellofreshsession import expires_at
-        if expires_at < now:
+        if expires_at < now.timestamp():
             token, token_type = getsession()
         else:
             from hellofreshsession import token, token_type
@@ -133,7 +133,7 @@ def next_delivery():
     # get nearest delivery date
     delivery_data_begin = []
     for entry in delivery_data:
-        if entry['begin'].timestamp() > now:
+        if entry['begin'].timestamp() > now.timestamp():
             delivery_data_begin.append({entry['begin']})
     delivery_data_nearest = next(iter(min(delivery_data_begin)))
     if debug:
@@ -144,7 +144,7 @@ def next_delivery():
 def seconds_offset(seconds_array):
     delivery = next_delivery()
     seconds_until_delivery = (delivery.replace(tzinfo=None) -
-                              datetime.fromtimestamp(now).replace(
+                              datetime.fromtimestamp(now.timestamp()).replace(
                                   second=0,
                                   microsecond=0
                                   )).total_seconds()
