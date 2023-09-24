@@ -1,4 +1,4 @@
-FROM python:3.12.0rc2 AS builder
+FROM python:3.12.0rc3 AS builder
 
 ENV LANG=C.UTF-8
 ENV PATH="/venv/bin:$PATH"
@@ -11,7 +11,7 @@ COPY requirements.txt /requirements.txt
 RUN pip install --no-cache-dir -r /requirements.txt
 
 
-FROM python:3.12.0rc2 AS runner
+FROM python:3.12.0rc3 AS runner
 
 ENV HOME /app
 ENV LANG=C.UTF-8
