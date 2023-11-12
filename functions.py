@@ -7,7 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 import cloudscraper
 
-from config import addminutes, country, debug, icsfile, icsname, locale, \
+from config import addminutes, debug, icsfile, icsname, params, \
         password, sessionfile, url, username
 
 from ics import Calendar, Event
@@ -44,7 +44,7 @@ def getsession():
     login_data_json = json.dumps(login_data, indent=4)
     # get access token
     try:
-        token_page = scraper.post(login_url, data=login_data_json)
+        token_page = scraper.post(login_url, data=login_data_json, params=params)
         token_page.raise_for_status()
     except Exception as err:
         print("Login failed, check credentials")
@@ -65,9 +65,6 @@ def getsession():
 def get_deliveries():
     token, token_type = testsession()
     headers = {'Authorization': token_type + ' ' + token}
-    params = dict()
-    params['country'] = country
-    params['locale'] = locale
     delivery_link_url = url + '/gw/api/customers/me/deliveries'
     try:
         delivery_link_page = \

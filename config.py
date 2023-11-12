@@ -10,6 +10,11 @@ sessionfile = 'hellofreshsession.py'
 country = os.environ.get('HELLOFRESH_ICS_COUNTRY', 'nl')
 locale = os.environ.get('HELLOFRESH_ICS_LOCALE', 'nl-NL')
 
+# parameters for http requests
+params = dict()
+params['country'] = country
+params['locale'] = locale
+
 icsfile = os.environ.get('HELLOFRESH_ICS_FILENAME', "hellofresh-delivery.ics")
 addminutes = 15
 icsname = 'HelloFresh Delivery'
