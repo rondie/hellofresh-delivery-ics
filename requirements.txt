@@ -3,4 +3,3 @@ cloudscraper == 1.2.71
 Flask        == 2.3.2
 requests     == 2.31.0
 ics          == 0.7.2
-arrow        == 1.3.0
