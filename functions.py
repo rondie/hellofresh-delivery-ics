@@ -8,7 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import cloudscraper
 
 from config import addminutes, debug, icsfile, icsname, params, \
-        password, sessionfile, url, username
+        password, sessionfile, timezone, url, username
 
 from ics import Calendar, Event
 
@@ -44,7 +44,10 @@ def getsession():
     login_data_json = json.dumps(login_data, indent=4)
     # get access token
     try:
-        token_page = scraper.post(login_url, data=login_data_json, params=params)
+        token_page = scraper.post(login_url,
+                                  data=login_data_json,
+                                  params=params
+                                  )
         token_page.raise_for_status()
     except Exception as err:
         print("Login failed, check credentials")
@@ -178,3 +181,17 @@ def fetch_hf_data():
         )
         if debug:
             print("DEBUG: next run scheduled at", run_date)
+
+
+def read_ics(icsfile):
+    file = open(icsfile, 'r')
+    events = []
+    cal = file.read()
+    c = Calendar(cal)
+    for e in sorted(c.events):
+        name = e.description
+        begin = e.begin.to(timezone).format('DD-MM-YYYY HH:mm')
+        end = e.end.to(timezone).format('HH:mm')
+        events.append((name, begin, end))
+    return (events)
+    file.close()

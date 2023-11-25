@@ -2,10 +2,10 @@
 
 from config import icsfile
 
-from flask import Flask, send_file
+from flask import Flask, render_template, send_file
 
 
-from functions import fetch_hf_data, scheduler
+from functions import debug, fetch_hf_data, read_ics, scheduler
 
 
 fetch_hf_data()
@@ -16,10 +16,12 @@ app = Flask(__name__)
 
 @app.route('/', methods=["GET"])
 def status():
-    return ('Jobs<br>' +
-            "".join(map(str, scheduler.get_jobs())) +
-            '<br><br>File<br><a target="_blank" rel="noopener" \
-            target="_blank" href="/' + icsfile + '">ics link</a>')
+    return render_template('status.html',
+                           debug=debug,
+                           jobs="".join(map(str, scheduler.get_jobs())),
+                           icsfile=icsfile,
+                           ics=read_ics(icsfile)
+                           )
 
 
 @app.route('/' + icsfile, methods=["GET"])

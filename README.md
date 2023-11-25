@@ -2,7 +2,7 @@
 
 Container to retrieve your next HelloFresh delivery as a calendar entry served via an ics file. It will fetch new data as the next delivery date gets nearer.
 
-Exporting your email and password should produce an ics file serverd through http to be used in a calendar.
+Exporting your email and password should produce an ics file served through http to be used in a calendar.
 
 ```
 export HELLOFRESH_USERNAME='<username>'
@@ -22,8 +22,9 @@ Environment variables that can be set:
 | HELLOFRESH_ICS_URL | https://www.hellofresh.nl |
 | HELLOFRESH_ICS_COUNTRY | nl |
 | HELLOFRESH_ICS_LOCALE | nl-NL |
+| HELLOFRESH_ICS_TIMEZONE | Europe/Amsterdam |
 
 Container runs on port 5000.
 
 # Debug
-Environment variable 'HELLOFRESH_ICS_DEBUG=true' will output taken actions
+Environment variable 'HELLOFRESH_ICS_DEBUG=true' will output taken actions in log output

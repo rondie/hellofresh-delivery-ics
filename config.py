@@ -9,6 +9,7 @@ url = os.environ.get('HELLOFRESH_ICS_URL', 'https://www.hellofresh.nl')
 sessionfile = 'hellofreshsession.py'
 country = os.environ.get('HELLOFRESH_ICS_COUNTRY', 'nl')
 locale = os.environ.get('HELLOFRESH_ICS_LOCALE', 'nl-NL')
+timezone = os.environ.get('HELLOFRESH_ICS_TIMEZONE', 'Europe/Amsterdam')
 
 # parameters for http requests
 params = dict()

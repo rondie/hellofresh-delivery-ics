@@ -1,0 +1,16 @@
+<!doctype html>
+<title>Hellofresh Delivery Dates</title>
+<nav>
+  {% if debug %}
+  <h1>Planned jobs</h1>
+    {{ jobs }}
+  <br>
+  {% endif %}
+  <h1>ICS link</h1>
+    <a target="_blank" rel="noopener" target="_blank" href="/{{ icsfile }}">{{ icsfile }}</a>
+  <h1>Planned Delivery Dates</h1>
+  {% for items in ics %}
+    <b>{{ items[1] }}:{{ items[2] }}</b> - {{ items[0] }}
+    <br>
+  {% endfor %}
+</nav>
