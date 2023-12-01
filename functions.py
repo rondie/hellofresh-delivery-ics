@@ -13,7 +13,6 @@ from config import addminutes, debug, icsfile, icsname, params, \
 from ics import Calendar, Event
 
 scraper = cloudscraper.create_scraper()
-now = datetime.now()
 seconds_array = [600, 1800, 7200, 86400]
 
 
@@ -28,7 +27,7 @@ scheduler = BackgroundScheduler({'apscheduler.executors.processpool': {
 def testsession():
     if exists('hellofreshsession.py'):
         from hellofreshsession import expires_at
-        if expires_at < now.timestamp():
+        if expires_at < datetime.now().timestamp():
             token, token_type = getsession()
         else:
             from hellofreshsession import token, token_type
@@ -133,21 +132,21 @@ def next_delivery():
     # get nearest delivery date
     delivery_data_begin = []
     for entry in delivery_data:
-        if entry['begin'].timestamp() > now.timestamp():
+        if entry['begin'].timestamp() > datetime.now().timestamp():
             delivery_data_begin.append({entry['begin']})
     delivery_data_nearest = next(iter(min(delivery_data_begin)))
-    if debug:
-        print("DEBUG: next delivery at", delivery_data_nearest)
     return (delivery_data_nearest)
 
 
 def seconds_offset(seconds_array):
     delivery = next_delivery()
     seconds_until_delivery = (delivery.replace(tzinfo=None) -
-                              datetime.fromtimestamp(now.timestamp()).replace(
-                                  second=0,
-                                  microsecond=0
-                                  )).total_seconds()
+                              datetime.fromtimestamp(
+                                  datetime.now().timestamp()
+                                  ).replace(
+                                      second=0,
+                                      microsecond=0
+                                      )).total_seconds()
     time_offset = []
     for sec in seconds_array:
         if sec < seconds_until_delivery:
@@ -158,28 +157,33 @@ def seconds_offset(seconds_array):
     return max(time_offset)
 
 
+def add_job(job, run_date, id):
+    scheduler.add_job(
+        job,
+        'date',
+        run_date=run_date
+    )
+
+
 def fetch_hf_data():
     try:
         get_deliveries()
-    except Exception:
-        run_date = now + timedelta(seconds=600)
-        scheduler.add_job(
+    except Exception as err:
+        add_job(
             fetch_hf_data,
-            'date',
-            run_date=run_date
-        )
+            datetime.now() + timedelta(seconds=600),
+            'fetch_hf_data'
+            )
         if debug:
-            print("DEBUG: retrieve failed, next try scheduled at", run_date)
+            print("DEBUG: retrieve failed")
+            print(err)
     else:
         create_ics(icsfile)
         delivery = next_delivery()
         run_date = delivery - timedelta(seconds=seconds_offset(seconds_array))
-        scheduler.add_job(
-            fetch_hf_data,
-            'date',
-            run_date=run_date
-        )
+        add_job(fetch_hf_data, run_date, 'fetch_hf_data')
         if debug:
+            print("DEBUG: next delivery at", delivery)
             print("DEBUG: next run scheduled at", run_date)
 
 
