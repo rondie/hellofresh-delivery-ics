@@ -13,7 +13,7 @@ from config import addminutes, debug, icsfile, icsname, params, \
 from ics import Calendar, Event
 
 scraper = cloudscraper.create_scraper()
-seconds_array = [600, 1800, 7200, 86400]
+seconds_array = [0, 600, 1800, 7200, 86400]
 
 
 scheduler = BackgroundScheduler({'apscheduler.executors.processpool': {
